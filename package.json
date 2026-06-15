@@ -1,25 +1,44 @@
 {
   "name": "flipkart-voice-agent",
   "version": "1.0.0",
-  "description": "A voice agent for Flipkart order management",
-  "main": "src/index.js",
+  "description": "A professional AI voice assistant for Flipkart customer support with STT and TTS capabilities",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest",
+    "lint": "eslint .",
+    "cli": "node src/index.js"
   },
   "keywords": [
     "voice",
-    "agent",
+    "assistant",
     "flipkart",
-    "orders"
+    "speech-to-text",
+    "text-to-speech",
+    "ai",
+    "groq",
+    "llm",
+    "customer-support"
   ],
-  "author": "",
+  "author": "Flipkart Voice Team",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sedoCdA/flipkart-voice-agent"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "dependencies": {
+    "cors": "^2.8.6",
     "dotenv": "^16.6.1",
+    "express": "^5.2.1",
     "groq-sdk": "^1.2.1"
   },
   "devDependencies": {
+    "jest": "^30.4.2",
     "nodemon": "^2.0.0"
   }
 }
