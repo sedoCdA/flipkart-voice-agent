@@ -7,11 +7,17 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js"
   },
-  "keywords": ["voice", "agent", "flipkart", "orders"],
+  "keywords": [
+    "voice",
+    "agent",
+    "flipkart",
+    "orders"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^16.0.0"
+    "dotenv": "^16.6.1",
+    "groq-sdk": "^1.2.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.0"
