@@ -1,0 +1,19 @@
+{
+  "name": "flipkart-voice-agent",
+  "version": "1.0.0",
+  "description": "A voice agent for Flipkart order management",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": ["voice", "agent", "flipkart", "orders"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.0"
+  }
+}
