@@ -1,4 +1,5 @@
 require("dotenv").config();
+const { cleanForSpeech } = require("./tools/utils/ttsCleanup");
 const readline = require("readline");
 const Groq = require("groq-sdk");
 
@@ -67,7 +68,8 @@ async function handleTurn(userInput) {
       ]
     });
 
-    const replyText = response.choices[0]?.message?.content || "";
+    const rawReply = response.choices[0]?.message?.content || "";
+    const replyText = cleanForSpeech(rawReply);
 
     console.log(`\nAgent: ${replyText}\n`);
 
