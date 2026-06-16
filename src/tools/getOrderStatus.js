@@ -7,7 +7,7 @@ const mockOrders = require("../data/mockOrders");
  * @param {string} orderId
  * @returns {Promise<object>} order state object, or an error object
  */
-async function getOrderStatus(orderId) {
+async function getOrderStatus(orderId, now = new Date()) {
   // Simulate network/API latency
   await new Promise((resolve) => setTimeout(resolve, 300));
 
@@ -24,8 +24,8 @@ async function getOrderStatus(orderId) {
 
   // Calculate staleness
   const lastUpdated = new Date(order.last_updated_timestamp);
-  const now = new Date(); // In real system, this is server "now"
-  const hoursSinceUpdate = (now - lastUpdated) / (1000 * 60 * 60);
+  const nowDate = now instanceof Date ? now : new Date(now);
+  const hoursSinceUpdate = (nowDate - lastUpdated) / (1000 * 60 * 60);
 
   return {
     success: true,

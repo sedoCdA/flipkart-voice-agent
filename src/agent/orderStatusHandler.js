@@ -11,8 +11,8 @@ const getOrderStatus = require("../tools/getOrderStatus");
  */
 function extractOrderId(text) {
   if (!text) return null;
-  const match = text.match(/FLP\d{3,}/i);
-  return match ? match[0].toUpperCase() : null;
+  const match = text.match(/FLP[\s-]*\d{3,}/i);
+  return match ? match[0].replace(/[^A-Z0-9]/gi, "").toUpperCase() : null;
 }
 
 /**
@@ -36,6 +36,10 @@ function getContactCount(sessionContext, orderId) {
 function checkEscalationTriggers(orderData, contactCount) {
   const reasons = [];
 
+  if (orderData.is_stale) {
+    reasons.push("Order data is stale (no live update available)");
+  }
+
   if (orderData.current_state === "SLA Breached") {
     reasons.push("SLA breached with no shipment progress");
   }
@@ -45,7 +49,6 @@ function checkEscalationTriggers(orderData, contactCount) {
     orderData.next_action &&
     orderData.next_action.toLowerCase().includes("refund")
   ) {
-    // Original order undelivered, re-shipment in motion
     reasons.push("Re-shipment initiated; original order undelivered");
   }
 
@@ -68,8 +71,8 @@ function checkEscalationTriggers(orderData, contactCount) {
  * @param {object} sessionContext - mutable session state (contact counts, history)
  * @returns {Promise<object>} { contextBlock, escalation, retrievalResult }
  */
-async function buildOrderContext(orderId, sessionContext = {}) {
-  const retrievalResult = await getOrderStatus(orderId);
+async function buildOrderContext(orderId, sessionContext = {}, now = new Date()) {
+  const retrievalResult = await getOrderStatus(orderId, now);
   const contactCount = getContactCount(sessionContext, orderId);
 
   if (!retrievalResult.success) {
@@ -83,6 +86,13 @@ async function buildOrderContext(orderId, sessionContext = {}) {
   const data = retrievalResult.data;
   const escalation = checkEscalationTriggers(data, contactCount);
 
+  let staleWarning = "";
+  if (data.is_stale) {
+    staleWarning = `
+⚠ DATA FRESHNESS WARNING: This data is ${data.hours_since_update} hours old (stale threshold is 6 hours).
+Instruction: Do NOT state current_state as if it reflects live status. You MAY state historical facts (promised_delivery_date has passed, order had not shipped as of last update, delay_reason) as plain facts. Acknowledge briefly that live status isn't available and that you're escalating — one sentence, no dwelling on the issue. Escalate now.`;
+  }
+
   const contextBlock = `RETRIEVED ORDER DATA (source of truth, do not deviate):
 order_id: ${data.order_id}
 current_state: ${data.current_state}
@@ -95,6 +105,7 @@ eta: ${data.eta ?? "not available"}
 new_expected_delivery_date: ${data.new_expected_delivery_date ?? "not applicable"}
 delay_reason: ${data.delay_reason ?? "not specified"}
 next_action: ${data.next_action ?? "none"}
+${staleWarning}
 
 SESSION CONTEXT:
 customer_contact_count_for_this_order: ${contactCount}
